@@ -130,7 +130,7 @@ def train_with_mlflow(nome, modelo, params, X_train, X_test, y_train, y_test):
 if __name__ == "__main__":
 
     # setando o experimento e agrupando todas as runs no Mlflow UI
-    mlflow.set_experiment("churn-predictiom")
+    mlflow.set_experiment("churn-prediction")
 
     X_train, X_test, y_train, y_test = load_and_preprocess('data/raw/WA_Fn-UseC_-Telco-Customer-Churn.csv')
 
