@@ -1,6 +1,6 @@
 # 📊 Churn MLOps Pipeline: Da EDA ao Deployment
 
-[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![MLflow](https://img.shields.io/badge/MLflow-Tracking-0194E2?logo=mlflow&logoColor=white)](https://mlflow.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.org/)
 [![Docker](https://img.shields.io/badge/Docker-Container-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
@@ -23,7 +23,7 @@ O Churn é uma das métricas mais críticas para empresas de serviços. Este pro
 ---
 
 ## 🛠️ Stack Tecnológica
-* **Linguagem:** Python 3.x
+* **Linguagem:** Python 3+
 * **Data Science:** Pandas, Numpy, Scikit-Learn.
 * **Visualização:** Matplotlib, Seaborn.
 * **MLOps:** MLflow (Tracking & Registry).
@@ -39,7 +39,7 @@ Durante a análise exploratória, foram aplicadas técnicas fundamentais para ga
 * **Feature Engineering:** Uso de **One-Hot Encoding** para transformar variáveis categóricas em representações numéricas interpretáveis pelo modelo.
 * **Análise de Correlação:** Identificou-se que contratos do tipo `Month-to-month` são os maiores preditores de cancelamento.
 
-### Comparativo de Performance (MLflow)
+###  ⚖ Comparativo de Performance (MLflow)
 
 | Modelo | Accuracy | ROC AUC | Recall (Churn) |
 | :--- | :---: | :---: | :---: |
@@ -52,16 +52,17 @@ Durante a análise exploratória, foram aplicadas técnicas fundamentais para ga
 ## 🏗️ Estrutura do Repositório
 
 ```bash
-├── data/               # Datasets (Raw e Processed)
-├── notebooks/          # EDA e Prototipagem de modelos
-├── src/                # Scripts de produção (Treino e API)
-│   ├── train.py        # Pipeline de treinamento e log no MLflow
-│   └── app.py          # API FastAPI para inferência real-time
-├── mlruns/             # Logs e artefatos de experimentos
-├── requirements.txt    # Gerenciamento de dependências
-└── README.md           # Documentação do projeto
+├── data/                     # Datasets (Raw e Processed)
+├── mlruns/                   # Logs e artefatos de experimentos
+├── models/                   # best_model e scaler (Pipeline antiga de treinamento)
+├── notebooks/                # EDA e Prototipagem de modelos
+├── src/                      # Scripts de produção (Treino e API)
+│   ├── train.py              # Pipeline de treinamento e log no MLflow
+│   └── register_model.py     # Pipeline de registro do melhor modelo no MLflow
+├── README.md                 # Documentação do projeto
+├── mlflow.db                 # Banco de dados local MLflow
+└── requirements.txt          # Gerenciamento de dependências
 ```
-
 ---
 
 ## 🚀 Como Executar o Projeto
@@ -74,6 +75,7 @@ Durante a análise exploratória, foram aplicadas técnicas fundamentais para ga
 git clone https://github.com/isjustjefferson/churn-mlops.git
 cd churn-mlops
 ```
+> Caso esteja usando o GitHub Desktop, siga o passo a passo da aplicação para clonar o repositório: https://docs.github.com/pt/desktop/adding-and-cloning-repositories/cloning-a-repository-from-github-to-github-desktop
 2. Criar um ambiente virtual (Recomendado, não é obrigatório para testar o projeto):
 ```bash
 python3 -m venv .venv      # Windows: python -m venv .venv
@@ -87,7 +89,7 @@ pip3 install -r requirements.txt  # Windows: pip install -r requirements.txt
 ```bash
 python3 src/train.py # Windows: python src/train.py
 ```
-> **Nota**: caso tenha criado um ambiente virtual (venv), sempre é necessário iniciá-lo pelo comando ```source .venv/bin/activate``` (Linux) ou ```.venv/Scripts/activate``` (Windows).
+> Caso tenha criado um **ambiente virtual (venv)**, sempre é necessário iniciá-lo pelo comando ```source .venv/bin/activate``` (Linux) ou ```.venv/Scripts/activate``` (Windows).
 5. Visualize no dashboad do MLflow UI:
 ```bash
 mlflow ui
