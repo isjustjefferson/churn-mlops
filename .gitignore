@@ -1,6 +1,6 @@
 .venv/
 data/raw/
-models/
+models/*.pkl
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
