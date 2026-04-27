@@ -4,6 +4,7 @@
 [![MLflow](https://img.shields.io/badge/MLflow-Tracking-0194E2?logo=mlflow&logoColor=white)](https://mlflow.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.org/)
 [![Docker](https://img.shields.io/badge/Docker-Container-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Railway](https://img.shields.io/badge/Deploy-Railway-purple?logo=railway&logoColor=white)](https://www.railway.com/)
 
 Este repositório contém a implementação de um pipeline de **MLOps** ponta a ponta para a predição de rotatividade de clientes (*Churn*). O projeto demonstra a transição de um modelo experimental em um Jupyter Notebook para uma aplicação conteinerizada e pronta para produção.
 
@@ -18,8 +19,8 @@ O Churn é uma das métricas mais críticas para empresas de serviços. Este pro
 - [x] **Fase 2: MLOps com MLflow** - Implementação de rastreamento de experimentos, versionamento de parâmetros e métricas.
 - [x] **Fase 3: Model Serving** - Criação de uma API REST robusta utilizando **FastAPI**.
 - [x] **Fase 4: Containerização** - Empacotamento da aplicação com **Docker** para garantir portabilidade.
-- [ ] **Fase 5: Cloud Deployment** - Deploy automatizado via CI/CD em plataformas Cloud (Railway/Render).
-
+- [x] **Fase 5: Cloud Deployment** - Deploy automatizado via CI/CD em plataformas Cloud (Railway/Render).
+### ✅ **Projeto concluído!**
 ---
 
 ## 🛠️ Stack Tecnológica
@@ -29,6 +30,7 @@ O Churn é uma das métricas mais críticas para empresas de serviços. Este pro
 * **MLOps:** MLflow (Tracking & Registry).
 * **Backend:** FastAPI (Uvicorn), Pydantic (Schema).
 * **DevOps:** Docker, Git.
+* **Deploy**: Railway
 
 ---
 
@@ -47,6 +49,10 @@ Durante a análise exploratória, foram aplicadas técnicas fundamentais para ga
 | **Random Forest (Baseline)** | 0.78 | 0.82 | 0.57 |
 | **Random Forest (Tuned)** | 0.80 | 0.83 | 0.49 |
 
+> Modelo em produção: **Logistic Regression**.
+> A remoção de multicolinearidade (TotalCharges × tenure ~0.83)
+> beneficiou o modelo linear, que superou o Random Forest.
+
 ---
 
 ## 🏗️ Estrutura do Repositório
@@ -64,45 +70,109 @@ Durante a análise exploratória, foram aplicadas técnicas fundamentais para ga
 │   ├── schema.py             # Script de schema (define os campos que a API aceita e seus tipos)
 │   ├── train.py              # Script de treinamento e log no MLflow
 │   └── register_model.py     # Script de registro do melhor modelo no MLflow
-├── Dockerfile                ← commit atual # Script de criação de imagem docker
-├── .dockerignore             ← commit atual # Arquivos exluídos na build 
+├── Dockerfile                # Script de criação de imagem docker
+├── .dockerignore             # Arquivos exluídos na build
+├── test_api.py               # Script de teste da API em produção
 ├── README.md                 # Documentação do projeto
 ├── mlflow.db                 # Banco de dados local MLflow
 └── requirements.txt          # Gerenciamento de dependências
 ```
 ---
 
-## 🚀 Como Executar o Projeto
-### ⚙️ Requisitos:
+## 🚀 Como Executar o Projeto 
+
+---
+### 🔗 API em produção
+**URL base:** `https://churn-mlops-production.up.railway.app`
+
+```yaml
+# health check
+curl https://churn-mlops-production.up.railway.app/
+
+# predição via curl
+curl -X POST "https://churn-mlops-production.up.railway.app/predict" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tenure": 6,
+    "MonthlyCharges": 70.5,
+    "SeniorCitizen": "No",
+    "Partner": "No",
+    "Dependents": "No",
+    "MultipleLines": "No",
+    "InternetService": "Fiber optic",
+    "OnlineSecurity": "No",
+    "OnlineBackup": "No",
+    "DeviceProtection": "No",
+    "TechSupport": "No",
+    "StreamingTV": "No",
+    "StreamingMovies": "No",
+    "Contract": "Month-to-month",
+    "PaperlessBilling": "Yes",
+    "PaymentMethod": "Electronic check"
+  }'
+
+```
+> A requisição deve ser feita via **POST**. É recomendado o uso de um cliente de API, como o Postman:
+> 1. Use a URL: `https://churn-mlops-production.up.railway.app/predict`
+> 2. Vá em `Body` e selecione `raw`. Cole o seguinte json de exemplo (os parâmetros podem ser alterados):
+> ```yaml
+> {
+>   "tenure": 6,
+>   "MonthlyCharges": 70.5,
+>   "SeniorCitizen": "No",
+>   "Partner": "No",
+>   "Dependents": "No",
+>   "MultipleLines": "No",
+>   "InternetService": "Fiber optic",
+>   "OnlineSecurity": "No",
+>   "OnlineBackup": "No",
+>   "DeviceProtection": "No",
+>   "TechSupport": "No",
+>   "StreamingTV": "No",
+>   "StreamingMovies": "No",
+>   "Contract": "Month-to-month",
+>   "PaperlessBilling": "Yes",
+>   "PaymentMethod": "Electronic check"
+> }
+> ```
+> 3. Cheque se em `Headers` o Content-Type está `application/json`.
+---
+### 🏠 Ambiente Local: 
+#### ⚙️ Requisitos:
 - **Python 3+**
 - **Git** (ou GitHub Desktop)
-### 📝 Passo a passo:
+#### 📝 Passo a passo:
 1. Clone o repositório:
 ```yaml
 git clone https://github.com/isjustjefferson/churn-mlops.git
 cd churn-mlops
 ```
 > Caso esteja usando o GitHub Desktop, siga o passo a passo da aplicação para clonar o repositório: https://docs.github.com/pt/desktop/adding-and-cloning-repositories/cloning-a-repository-from-github-to-github-desktop
-2. Criar um ambiente virtual (Recomendado, não é obrigatório para testar o projeto):
+2. Baixe o dataset (Kaggle)
+```yaml
+  kaggle datasets download -d blastchar/telco-customer-churn \
+  -p data/raw --unzip
+```
+3. Criar um ambiente virtual (Recomendado, não é obrigatório para testar o projeto):
 ```yaml
 python3 -m venv .venv      # Windows: python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 ```
-3. Instale as dependências:
+4. Instale as dependências:
 ```yaml
 pip3 install -r requirements.txt  # Windows: pip install -r requirements.txt
 ```
-4. Treine os modelos:
+5. Treine os modelos:
 ```yaml
 python3 src/train.py # Windows: python src/train.py
 ```
 > Caso tenha criado um **ambiente virtual (venv)**, sempre é necessário iniciá-lo pelo comando ```source .venv/bin/activate``` (Linux) ou ```.venv/Scripts/activate``` (Windows).
-5. Visualize no dashboad do MLflow UI:
+6. Visualize no dashboad do MLflow UI:
 ```yaml
 mlflow ui
 ```
 > Clique no experimento ``churn-prediction`` e explore. Recomenda-se usar ``Compare`` entre os modelos, visualizar parâmetros, métricas e o modelo em ``Artifacts`` e observar os gráficos comparativo entre as métricas dos modelos na aba ``Chart view``
-6. (Recomendado) Registre o melhor modelo no Model Registry:
+7. (Recomendado) Registre o melhor modelo no Model Registry:
 ```yaml
 python3 src/register_model.py  # Windows: python src/register_model.py
 ```
@@ -110,7 +180,7 @@ python3 src/register_model.py  # Windows: python src/register_model.py
 > ```yaml
 > Veja no UI: http://127.0.0.1:5000/#/models/churn-classifier
 > ```
-7. (Recomendado) Teste a API:
+8. (Recomendado) Teste a API:
 ```yaml
 uvicorn src.app:app --reload # --reload reinicia a API caso você altere o código. Dispensável se não for sua intenção. 
 ```
@@ -126,7 +196,7 @@ INFO:     Application startup complete.
 http://127.0.0.1:8000/docs
 ```
 > **Atenção ao terminal!** É possível que a porta que o Uvicorn esteja rodando seja diferente da 8000, é importante observar no terminal o URL exato para a porta correta.
-8. (Recomendado) Teste a API dockerizada:
+9. (Recomendado) Teste a API dockerizada:
 ```yaml
 docker build -t churn-api . # constrói a imagem Docker
 docker run -d -p 8000:8000 --name churn-container churn-api # roda o container na porta 8000
@@ -163,6 +233,14 @@ docker run -d -p 8000:8000 --name churn-container churn-api # roda o container n
 >
 > # inicia o container
 > docker start churn-container
->
 > # remove o container (é necessário rodar docker stop antes)
 > docker rm churn-container
+10. É possível testar a API de forma mais facilitada rodando o script `test_api.py` na root do projeto:
+```yaml
+python3 test_api.py  # Windows: python test_api.py
+```
+---
+## 👤 Autor
+
+**Jefferson Silva** · [LinkedIn](https://www.linkedin.com/in/jefferson-silva-1a035836b/)
+· [GitHub](https://github.com/isjustjefferson)
