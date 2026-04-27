@@ -1,0 +1,9 @@
+test_api.py
+.venv/
+data/
+mlruns/
+notebooks/
+__pycahce__/
+*.pyc
+.git/
+.gitignore

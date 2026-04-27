@@ -28,7 +28,7 @@ def load_artifacts():
 """
 def preprocess_input(data: CustomerInput) -> pd.DataFrame:
     # convertendo o input Pydantic para DataFrame
-    df = pd.dataFrame([data.dict()])
+    df = pd.DataFrame([data.dict()])
 
     # carrregando colunas numéricas
     num_cols = ['tenure', 'MonthlyCharges']
@@ -39,7 +39,7 @@ def preprocess_input(data: CustomerInput) -> pd.DataFrame:
 
     # carregando colunas de treino
     train_cols = model.feature_names_in_
-    df = df.reindez(columns = trains_cols, fill_value = 0) # colunas que não existem recebem input 0
+    df = df.reindex(columns = train_cols, fill_value = 0) # colunas que não existem recebem input 0
 
     # normalizando os valores numéricos
     df[num_cols] = scaler.transform(df[num_cols])
