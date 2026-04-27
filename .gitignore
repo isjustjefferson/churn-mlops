@@ -1,7 +1,6 @@
 test_api.py
 .venv/
 data/raw/
-models/*.pk1
 models/*.pkl
 mlruns/*.pkl
 __pycache__/
