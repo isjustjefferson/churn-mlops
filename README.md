@@ -17,7 +17,7 @@ O Churn é uma das métricas mais críticas para empresas de serviços. Este pro
 - [x] **Fase 1: Baseline & EDA** - Definição do problema, limpeza de dados e treinamento de modelos iniciais.
 - [x] **Fase 2: MLOps com MLflow** - Implementação de rastreamento de experimentos, versionamento de parâmetros e métricas.
 - [x] **Fase 3: Model Serving** - Criação de uma API REST robusta utilizando **FastAPI**.
-- [ ] **Fase 4: Containerização** - Empacotamento da aplicação com **Docker** para garantir portabilidade.
+- [x] **Fase 4: Containerização** - Empacotamento da aplicação com **Docker** para garantir portabilidade.
 - [ ] **Fase 5: Cloud Deployment** - Deploy automatizado via CI/CD em plataformas Cloud (Railway/Render).
 
 ---
@@ -60,10 +60,12 @@ Durante a análise exploratória, foram aplicadas técnicas fundamentais para ga
 │   └── scaler.pkl            ← no .gitignore
 ├── notebooks/                # EDA e Prototipagem de modelos
 ├── src/                      # Scripts de produção (Treino e API)
-│   ├── app.py                ← commit atual # Script da API (carrega o modelo e inializa a API)
-│   ├── schema.py             ← commit atual # Script de schema (define os campos que a API aceita e seus tipos)
+│   ├── app.py                # Script da API (carrega o modelo e inializa a API)
+│   ├── schema.py             # Script de schema (define os campos que a API aceita e seus tipos)
 │   ├── train.py              # Script de treinamento e log no MLflow
 │   └── register_model.py     # Script de registro do melhor modelo no MLflow
+├── Dockerfile                ← commit atual # Script de criação de imagem docker
+├── .dockerignore             ← commit atual # Arquivos exluídos na build 
 ├── README.md                 # Documentação do projeto
 ├── mlflow.db                 # Banco de dados local MLflow
 └── requirements.txt          # Gerenciamento de dependências
@@ -124,3 +126,43 @@ INFO:     Application startup complete.
 http://127.0.0.1:8000/docs
 ```
 > **Atenção ao terminal!** É possível que a porta que o Uvicorn esteja rodando seja diferente da 8000, é importante observar no terminal o URL exato para a porta correta.
+8. (Recomendado) Teste a API dockerizada:
+```yaml
+docker build -t churn-api . # constrói a imagem Docker
+docker run -d -p 8000:8000 --name churn-container churn-api # roda o container na porta 8000
+```
+- Para fazer alguns testes de API, você pode executar:
+> ```yaml
+> # health check
+> curl http://localhost:8000/ 
+>
+> # predição
+> curl -X POST "http://localhost:8000/predict" \
+> -H "Content-Type: application/json" \
+> -d '{
+>   "tenure": 6, "MonthlyCharges": 70.5,
+>   "SeniorCitizen": "No", "Partner": "No",
+>   "Dependents": "No", "MultipleLines": "No",
+>   "InternetService": "Fiber optic",
+>   "OnlineSecurity": "No", "OnlineBackup": "No",
+>   "DeviceProtection": "No", "TechSupport": "No",
+>   "StreamingTV": "No", "StreamingMovies": "No",
+>   "Contract": "Month-to-month",
+>   "PaperlessBilling": "Yes",
+>   "PaymentMethod": "Electronic check"
+>   }'
+> ```
+
+- Comandos úteis de gerenciamento do container:
+> ```yaml
+> # logs de API do container
+> docker logs churn-container
+>
+> # para o container (rode toda vez que terminar os experimentos!) 
+> docker stop churn-container
+>
+> # inicia o container
+> docker start churn-container
+>
+> # remove o container (é necessário rodar docker stop antes)
+> docker rm churn-container
